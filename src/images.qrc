@@ -34,5 +34,13 @@
         <file>images/small_arrow.png</file>
         <file>images/shadow.png</file>
         <file>images/handle_small.png</file>
+        <file>images/guard.png</file>
+        <file>images/origin.png</file>
+        <file>images/candle_256.png</file>
+        <file>images/run.png</file>
+        <file>images/num1.png</file>
+        <file>images/num2.png</file>
+        <file>images/num3.png</file>
+        <file>images/num4.png</file>
     </qresource>
 </RCC>

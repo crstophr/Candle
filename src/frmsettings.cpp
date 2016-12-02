@@ -1,5 +1,5 @@
-// This file is a part of "grblControl" application.
-// Copyright 2015 Hayrullin Denis Ravilevich
+// This file is a part of "Candle" application.
+// Copyright 2015-2016 Hayrullin Denis Ravilevich
 
 #include "frmsettings.h"
 #include "ui_frmsettings.h"
@@ -14,8 +14,8 @@ frmSettings::frmSettings(QWidget *parent) :
     ui(new Ui::frmSettings)
 {
     ui->setupUi(this);
-    this->setLocale(QLocale::C);
 
+    this->setLocale(QLocale::C);
     m_intValidator.setBottom(1);
     m_intValidator.setTop(999);
     ui->cboFps->setValidator(&m_intValidator);
@@ -240,14 +240,34 @@ void frmSettings::setShowUICommands(bool showUICommands)
     ui->chkShowUICommands->setChecked(showUICommands);
 }
 
-double frmSettings::safeZ()
+QString frmSettings::safePositionCommand()
 {
-    return ui->txtSafeZ->value();
+    return ui->txtSafeCommand->text();
 }
 
-void frmSettings::setSafeZ(double safeZ)
+void frmSettings::setSafePositionCommand(QString command)
 {
-    ui->txtSafeZ->setValue(safeZ);
+    ui->txtSafeCommand->setText(command);
+}
+
+bool frmSettings::moveOnRestore()
+{
+    return ui->chkMoveOnRestore->isChecked();
+}
+
+void frmSettings::setMoveOnRestore(bool value)
+{
+    ui->chkMoveOnRestore->setChecked(value);
+}
+
+int frmSettings::restoreMode()
+{
+    return ui->cboRestoreMode->currentIndex();
+}
+
+void frmSettings::setRestoreMode(int value)
+{
+    ui->cboRestoreMode->setCurrentIndex(value);
 }
 
 int frmSettings::spindleSpeedMin()
@@ -268,6 +288,26 @@ int frmSettings::spindleSpeedMax()
 void frmSettings::setSpindleSpeedMax(int speed)
 {
     ui->txtSpindleSpeedMax->setValue(speed);
+}
+
+int frmSettings::laserPowerMin()
+{
+    return ui->txtLaserPowerMin->value();
+}
+
+void frmSettings::setLaserPowerMin(int value)
+{
+    ui->txtLaserPowerMin->setValue(value);
+}
+
+int frmSettings::laserPowerMax()
+{
+    return ui->txtLaserPowerMax->value();
+}
+
+void frmSettings::setLaserPowerMax(int value)
+{
+    ui->txtLaserPowerMax->setValue(value);
 }
 
 int frmSettings::rapidSpeed()
@@ -340,6 +380,16 @@ void frmSettings::setFps(int fps)
     ui->cboFps->setCurrentText(QString::number(fps));
 }
 
+bool frmSettings::vsync()
+{
+    return ui->chkVSync->isChecked();
+}
+
+void frmSettings::setVsync(bool value)
+{
+    ui->chkVSync->setChecked(value);
+}
+
 bool frmSettings::msaa()
 {
     return ui->radMSAA->isChecked();
@@ -398,6 +448,16 @@ double frmSettings::simplifyPrecision()
 void frmSettings::setSimplifyPrecision(double simplifyPrecision)
 {
     ui->txtSimplifyPrecision->setValue(simplifyPrecision);
+}
+
+bool frmSettings::panelUserCommands()
+{
+    return ui->chkPanelUserCommands->isChecked();
+}
+
+void frmSettings::setPanelUserCommands(bool value)
+{
+    ui->chkPanelUserCommands->setChecked(value);
 }
 
 bool frmSettings::panelHeightmap()
@@ -461,6 +521,68 @@ void frmSettings::setFontSize(int fontSize)
     ui->cboFontSize->setCurrentText(QString::number(fontSize));
 }
 
+bool frmSettings::grayscaleSegments()
+{
+    return ui->chkGrayscale->isChecked();
+}
+
+void frmSettings::setGrayscaleSegments(bool value)
+{
+    ui->chkGrayscale->setChecked(value);
+}
+
+bool frmSettings::grayscaleSCode()
+{
+    return ui->radGrayscaleS->isChecked();
+}
+
+void frmSettings::setGrayscaleSCode(bool value)
+{
+    ui->radGrayscaleS->setChecked(value);
+    ui->radGrayscaleZ->setChecked(!value);
+}
+
+bool frmSettings::drawModeVectors()
+{
+    return ui->radDrawModeVectors->isChecked();
+}
+
+void frmSettings::setDrawModeVectors(bool value)
+{
+    ui->radDrawModeVectors->setChecked(value);
+    ui->radDrawModeRaster->setChecked(!value);
+}
+
+QString frmSettings::userCommands(int index)
+{
+    return this->findChild<QLineEdit*>(QString("txtUserCommand%1").arg(index))->text();
+}
+
+void frmSettings::setUserCommands(int index, QString commands)
+{
+    this->findChild<QLineEdit*>(QString("txtUserCommand%1").arg(index))->setText(commands);
+}
+
+bool frmSettings::ignoreErrors()
+{
+    return ui->chkIgnoreErrors->isChecked();
+}
+
+void frmSettings::setIgnoreErrors(bool value)
+{
+    ui->chkIgnoreErrors->setChecked(value);
+}
+
+bool frmSettings::autoLine()
+{
+    return ui->chkAutoLine->isChecked();
+}
+
+void frmSettings::setAutoLine(bool value)
+{
+    ui->chkAutoLine->setChecked(value);
+}
+
 void frmSettings::showEvent(QShowEvent *se)
 {
     Q_UNUSED(se)
@@ -475,7 +597,7 @@ void frmSettings::searchPorts()
     foreach (QSerialPortInfo info ,QSerialPortInfo::availablePorts()) {
 //        ui->cboPort->addItem(info.portName());
         ui->cboPort->insertItem(0, info.portName());
-    }    
+    }
 }
 
 void frmSettings::on_cmdRefresh_clicked()
@@ -501,16 +623,25 @@ void frmSettings::on_cboToolType_currentIndexChanged(int index)
 
 void frmSettings::on_cmdDefaults_clicked()
 {
+    if (QMessageBox::warning(this, qApp->applicationDisplayName(), tr("Reset settings to default values?"),
+                             QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel) != QMessageBox::Yes) return;
+
     setPort("");
     setBaud(115200);
 
+    setIgnoreErrors(false);
+
     setQueryStateTime(40);
-    setSafeZ(10.0);
     setRapidSpeed(2000);
     setAcceleration(100);
     setSpindleSpeedMin(0);
     setSpindleSpeedMax(10000);
-    setTouchCommand("");
+    setLaserPowerMin(0);
+    setLaserPowerMax(100);
+    setTouchCommand("G21G91G38.2Z-30F100; G0Z1; G38.2Z-2F10");
+    setSafePositionCommand("G21G90; G53G0Z0");
+    setMoveOnRestore(false);
+    setRestoreMode(0);
     setHeightmapProbingFeed(10);
     setUnits(0);
 
@@ -525,6 +656,9 @@ void frmSettings::on_cmdDefaults_clicked()
     setSimplifyPrecision(0.0);
     setFps(60);
     setZBuffer(false);
+    setGrayscaleSegments(false);
+    setGrayscaleSCode(true);
+    setDrawModeVectors(true);
 
     setToolType(1);
     setToolAngle(15.0);
@@ -537,7 +671,7 @@ void frmSettings::on_cmdDefaults_clicked()
     setPanelFeed(true);
     setPanelHeightmap(true);
     setPanelJog(true);
-    setPanelSpindle(true);
+    setPanelSpindle(true);   
 
     ui->clpTool->setColor(QColor(255, 153, 0));
 
@@ -557,4 +691,28 @@ void frmSettings::on_cmdDefaults_clicked()
 void frmSettings::on_cboFontSize_currentTextChanged(const QString &arg1)
 {
     qApp->setStyleSheet(QString(qApp->styleSheet()).replace(QRegExp("font-size:\\s*\\d+"), "font-size: " + arg1));
+}
+
+void frmSettings::on_radDrawModeVectors_toggled(bool checked)
+{
+    ui->chkSimplify->setEnabled(checked);
+    ui->lblSimpilyPrecision->setEnabled(checked && ui->chkSimplify->isChecked());
+    ui->txtSimplifyPrecision->setEnabled(checked && ui->chkSimplify->isChecked());
+
+    ui->radDrawModeRaster->setChecked(!checked);
+}
+
+void frmSettings::on_radDrawModeRaster_toggled(bool checked)
+{
+    ui->radDrawModeVectors->setChecked(!checked);
+}
+
+void frmSettings::on_radGrayscaleS_toggled(bool checked)
+{
+    ui->radGrayscaleZ->setChecked(!checked);
+}
+
+void frmSettings::on_radGrayscaleZ_toggled(bool checked)
+{
+    ui->radGrayscaleS->setChecked(!checked);
 }

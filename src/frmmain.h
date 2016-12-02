@@ -1,5 +1,5 @@
-// This file is a part of "grblControl" application.
-// Copyright 2015 Hayrullin Denis Ravilevich
+// This file is a part of "Candle" application.
+// Copyright 2015-2016 Hayrullin Denis Ravilevich
 
 #ifndef FRMMAIN_H
 #define FRMMAIN_H
@@ -15,6 +15,8 @@
 #include <QMenu>
 #include <QDragEnterEvent>
 #include <QDropEvent>
+#include <QProgressDialog>
+#include <exception>
 
 #include "parser/gcodeviewparse.h"
 
@@ -25,6 +27,7 @@
 #include "drawers/heightmapgriddrawer.h"
 #include "drawers/heightmapinterpolationdrawer.h"
 #include "drawers/shaderdrawable.h"
+#include "drawers/selectiondrawer.h"
 
 #include "tables/gcodetablemodel.h"
 #include "tables/heightmaptablemodel.h"
@@ -58,17 +61,30 @@ struct CommandQueue {
     bool showInConsole;
 };
 
+class CancelException : public std::exception {
+public:
+#ifdef Q_OS_MAC
+#undef _GLIBCXX_USE_NOEXCEPT
+#define _GLIBCXX_USE_NOEXCEPT _NOEXCEPT
+#endif
+
+    const char* what() const _GLIBCXX_USE_NOEXCEPT
+    {
+        return "Operation was cancelled by user";
+    }
+};
+
 class frmMain : public QMainWindow
 {
     Q_OBJECT
 
 public:
     explicit frmMain(QWidget *parent = 0);
-    ~frmMain();    
+    ~frmMain();
 
     double toolZPosition();
 
-private slots:    
+private slots:
     void updateHeightMapInterpolationDrawer(bool reset = false);
     void placeVisualizerButtons();
 
@@ -83,13 +99,15 @@ private slots:
     void onTableInsertLine();
     void onTableDeleteLines();
     void onActRecentFileTriggered();
+    void onActSendFromLineTriggered();
     void onCboCommandReturnPressed();
     void onTableCurrentChanged(QModelIndex idx1, QModelIndex idx2);
     void onConsoleResized(QSize size);
     void onPanelsSizeChanged(QSize size);
+    void onCmdUserClicked(bool checked);
 
     void on_actFileExit_triggered();
-    void on_cmdFileOpen_clicked();        
+    void on_cmdFileOpen_clicked();
     void on_cmdFit_clicked();
     void on_cmdFileSend_clicked();
     void onTableCellChanged(QModelIndex i1, QModelIndex i2);
@@ -100,10 +118,10 @@ private slots:
     void on_cmdTouch_clicked();
     void on_cmdZeroXY_clicked();
     void on_cmdZeroZ_clicked();
-    void on_cmdReturnXY_clicked();
+    void on_cmdRestoreOrigin_clicked();
     void on_cmdReset_clicked();
     void on_cmdUnlock_clicked();
-    void on_cmdTopZ_clicked();
+    void on_cmdSafePosition_clicked();
     void on_cmdSpindle_toggled(bool checked);
     void on_txtSpindleSpeed_editingFinished();
     void on_sliSpindleSpeed_valueChanged(int value);
@@ -132,6 +150,7 @@ private slots:
     void on_grpFeed_toggled(bool checked);
     void on_grpSpindle_toggled(bool checked);
     void on_grpJog_toggled(bool checked);
+    void on_grpUserCommands_toggled(bool checked);
     void on_chkKeyboardControl_toggled(bool checked);
     void on_tblProgram_customContextMenuRequested(const QPoint &pos);
     void on_splitter_splitterMoved(int pos, int index);
@@ -156,6 +175,8 @@ private slots:
     void on_cmdHeightMapCreate_clicked();
     void on_cmdHeightMapBorderAuto_clicked();
     void on_cmdFileAbort_clicked();
+    void on_sliSpindleSpeed_actionTriggered(int action);
+    void on_cmdSpindle_clicked(bool checked);
 
 protected:
     void showEvent(QShowEvent *se);
@@ -175,7 +196,7 @@ private:
 
     OriginDrawer *m_originDrawer;
 
-    GcodeDrawer *m_codeDrawer;
+    GcodeDrawer *m_codeDrawer;    
     GcodeDrawer *m_probeDrawer;
     GcodeDrawer *m_currentDrawer;
 
@@ -183,6 +204,8 @@ private:
     HeightMapBorderDrawer m_heightMapBorderDrawer;
     HeightMapGridDrawer m_heightMapGridDrawer;
     HeightMapInterpolationDrawer m_heightMapInterpolationDrawer;
+
+    SelectionDrawer m_selectionDrawer;
 
     GCodeTableModel m_programModel;
     GCodeTableModel m_probeModel;
@@ -195,12 +218,13 @@ private:
 
     QSerialPort m_serialPort;
 
-    frmSettings m_settings;
+    frmSettings *m_settings;
     frmAbout m_frmAbout;
 
     QString m_settingsFileName;
     QString m_programFileName;
     QString m_heightMapFileName;
+    QString m_lastFolder;
 
     bool m_fileChanged = false;
     bool m_heightMapChanged = false;
@@ -224,6 +248,9 @@ private:
     QList<CommandQueue> m_queue;
     QTime m_startTime;
 
+    QMessageBox* m_senderErrorBox;
+
+    // Stored origin
     double m_storedX = 0;
     double m_storedY = 0;
     double m_storedZ = 0;
@@ -238,13 +265,12 @@ private:
     bool m_settingZeroXY = false;
     bool m_settingZeroZ = false;
     bool m_homing = false;
-    bool m_programSpeed = false;
     bool m_updateSpindleSpeed = false;
     bool m_updateParserStatus = false;
     bool m_updateFeed = false;
 
     bool m_reseting = false;
-    bool m_resetCompleted = true;    
+    bool m_resetCompleted = true;
     bool m_aborting = false;
     bool m_statusReceived = false;
 
@@ -269,7 +295,7 @@ private:
     bool m_keyPressed = false;
     bool m_jogBlock = false;
     bool m_absoluteCoordinates;
-    bool m_storedKeyboardControl;      
+    bool m_storedKeyboardControl;
 
     // Spindle
     bool m_spindleCW = true;
@@ -281,6 +307,7 @@ private:
     void loadFile(QString fileName);
     void loadFile(QList<QString> data);
     void clearTable();
+    void preloadSettings();
     void loadSettings();
     void saveSettings();
     bool saveChanges(bool heightMapMode);
@@ -301,7 +328,7 @@ private:
     QString feedOverride(QString command);
 
     bool eventFilter(QObject *obj, QEvent *event);
-    void blockJogForRapidMovement();
+    void blockJogForRapidMovement(bool repeated = false);
     bool keyIsMovement(int key);
     void resizeCheckBoxes();
     void updateLayouts();

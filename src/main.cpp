@@ -1,5 +1,5 @@
-// This file is a part of "grblControl" application.
-// Copyright 2015 Hayrullin Denis Ravilevich
+// This file is a part of "Candle" application.
+// Copyright 2015-2016 Hayrullin Denis Ravilevich
 
 #include <QApplication>
 #include <QDebug>
@@ -41,11 +41,11 @@ int main(int argc, char *argv[])
     glf.setSamples(8);
     QGLFormat::setDefaultFormat(glf);
 
-//    QLocale::setDefault(QLocale("fr"));
+//    QLocale::setDefault(QLocale("es"));
 
     QString loc = QLocale().name().left(2);
     QString translationsFolder = qApp->applicationDirPath() + "/translations/";
-    QString translationFileName = translationsFolder + "grblControl_" + loc + ".qm";
+    QString translationFileName = translationsFolder + qApp->applicationDisplayName() + "_" + loc + ".qm";
 
     qDebug() << "locale:" << loc;
 
@@ -59,12 +59,13 @@ int main(int argc, char *argv[])
     if(QFile::exists(translationFileName)) {
         QTranslator* baseTranslator = new QTranslator();
         if (baseTranslator->load(baseTranslationFileName)) a.installTranslator(baseTranslator); else delete baseTranslator;
-    }   
+    }
 
     a.setApplicationVersion(APP_VERSION);
 
-#ifdef UNIX    
+#ifdef UNIX
     if (!styleOverrided) foreach (QString str, QStyleFactory::keys()) {
+        qDebug() << "style" << str;
         if (str.contains("GTK+")) {
             a.setStyle(QStyleFactory::create(str));
             break;

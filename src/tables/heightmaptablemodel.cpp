@@ -1,5 +1,5 @@
-// This file is a part of "grblControl" application.
-// Copyright 2015 Hayrullin Denis Ravilevich
+// This file is a part of "Candle" application.
+// Copyright 2015-2016 Hayrullin Denis Ravilevich
 
 #include "heightmaptablemodel.h"
 
@@ -17,7 +17,7 @@ void HeightMapTableModel::resize(int cols, int rows)
     for (int i = 0; i < rows; i++) {
         QVector<double> row;
         for (int j = 0; j < cols; j++) {
-            row.append(NAN);
+            row.append(qQNaN());
         }
         m_data.append(row);
     }

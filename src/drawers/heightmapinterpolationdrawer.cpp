@@ -1,5 +1,5 @@
-// This file is a part of "grblControl" application.
-// Copyright 2015 Hayrullin Denis Ravilevich
+// This file is a part of "Candle" application.
+// Copyright 2015-2016 Hayrullin Denis Ravilevich
 
 #include "heightmapinterpolationdrawer.h"
 
@@ -46,7 +46,7 @@ bool HeightMapInterpolationDrawer::updateData()
     // Horizontal lines
     for (int i = 0; i < interpolationPointsY; i++) {
         for (int j = 1; j < interpolationPointsX; j++) {
-            if (std::isnan(m_data->at(i).at(j))) continue;
+            if (qIsNaN(m_data->at(i).at(j))) continue;
             color.setHsvF(0.67 * (max - m_data->at(i).at(j - 1)) / (max - min), 1.0, 1.0);
             vertex.color = QVector3D(color.redF(), color.greenF(), color.blueF());
 
@@ -64,7 +64,7 @@ bool HeightMapInterpolationDrawer::updateData()
     // Vertical lines
     for (int j = 0; j < interpolationPointsX; j++) {
         for (int i = 1; i < interpolationPointsY; i++) {
-            if (std::isnan(m_data->at(i).at(j))) continue;
+            if (qIsNaN(m_data->at(i).at(j))) continue;
             color.setHsvF(0.67 * (max - m_data->at(i - 1).at(j)) / (max - min), 1.0, 1.0);
             vertex.color = QVector3D(color.redF(), color.greenF(), color.blueF());
 

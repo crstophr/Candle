@@ -1,5 +1,5 @@
-// This file is a part of "grblControl" application.
-// Copyright 2015 Hayrullin Denis Ravilevich
+// This file is a part of "Candle" application.
+// Copyright 2015-2016 Hayrullin Denis Ravilevich
 
 #ifndef GCODETABLEMODEL_H
 #define GCODETABLEMODEL_H
@@ -9,11 +9,13 @@
 
 struct GCodeItem
 {
+    enum States { InQueue, Sent, Processed, Skipped };
+
     QString command;
-    QString state;
-    QString status;
+    char state;
+    QString response;
     int line;
-    QList<QString> args;
+    QStringList args;
 };
 
 class GCodeTableModel : public QAbstractTableModel
@@ -26,6 +28,7 @@ public:
     bool setData(const QModelIndex &index, const QVariant &value, int role = Qt::EditRole);
     bool insertRow(int row, const QModelIndex &parent = QModelIndex());
     bool removeRow(int row, const QModelIndex &parent = QModelIndex());
+    bool removeRows(int row, int count, const QModelIndex &parent = QModelIndex());
     void clear();
 
     int rowCount(const QModelIndex &parent = QModelIndex()) const;
@@ -34,13 +37,15 @@ public:
     QVariant headerData(int section, Qt::Orientation orientation, int role) const;
     Qt::ItemFlags flags(const QModelIndex &index) const;
 
+    QList<GCodeItem> &data();
+
 signals:
 
 public slots:
 
 private:
-    QList<GCodeItem*> m_data;
-    QList<QString> m_headers;
+    QList<GCodeItem> m_data;
+    QStringList m_headers;
 };
 
 #endif // GCODETABLEMODEL_H

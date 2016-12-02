@@ -5,15 +5,17 @@
 #-------------------------------------------------
 
 QT       = core gui opengl serialport
+greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
 win32: {
     QT += winextras
     DEFINES += WINDOWS
-    LIBS += -L"C:\\WinDDK\\7600.16385.1\\lib\\win7\\i386" -L"C:\\Program Files (x86)\\Microsoft SDKs\\Windows\\v7.1A\\Lib" -lopengl32
-    LIBS += -L"C:\\Program Files\\Microsoft SDKs\\Windows\\v7.1\\Lib" -lopengl32
+    QMAKE_LFLAGS += "-Wl,--large-address-aware"
+    QMAKE_CXXFLAGS_DEBUG += -g3 -pg
+    QMAKE_LFLAGS_DEBUG += -pg -lgmon
 }
 
-unix: {
+unix:!macx {
     DEFINES += UNIX #GL_GLEXT_PROTOTYPES
     QMAKE_LFLAGS += "-Wl,-rpath,\'\$$ORIGIN/libs\'"
 }
@@ -23,21 +25,17 @@ contains(QT_CONFIG, opengles.) {
     DEFINES += GLES
     INSTALLS += target
     target.path = /home/pi
-#    QMAKE_CXXFLAGS += -mno-unaligned-access
-#    QMAKE_LFLAGS += -mno-unaligned-access
 }
 
-#DEFINES += sNan=\"NAN\"
+TARGET = Candle
+TEMPLATE = app
+VERSION = 1.0.9
+RC_ICONS += images/candle.ico
+
 DEFINES += sNan=\"65536\"
-
-greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
-
-VERSION = 0.8.1
-
 DEFINES += APP_VERSION=\\\"$$VERSION\\\"
 
-TARGET = grbl_control
-TEMPLATE = app
+TRANSLATIONS += translations/candle_ru.ts translations/candle_es.ts translations/candle_fr.ts translations/candle_pt.ts
 
 SOURCES += main.cpp\
         frmmain.cpp \
@@ -50,6 +48,7 @@ SOURCES += main.cpp\
     drawers/origindrawer.cpp \
     drawers/shaderdrawable.cpp \
     drawers/tooldrawer.cpp \
+    drawers/selectiondrawer.cpp \
     parser/arcproperties.cpp \
     parser/gcodeparser.cpp \
     parser/gcodepreprocessorutils.cpp \
@@ -92,7 +91,8 @@ HEADERS  += frmmain.h \
     widgets/scrollarea.h \
     widgets/styledtoolbutton.h \
     widgets/widget.h \
-    widgets/glwidget.h
+    widgets/glwidget.h \
+    drawers/selectiondrawer.h
 
 FORMS    += frmmain.ui \
     frmsettings.ui \
@@ -105,12 +105,3 @@ RESOURCES += \
     images.qrc
 
 CONFIG += c++11
-
-RC_ICONS += images/grblControl2.ico
-
-TRANSLATIONS += translations/grblControl_ru.ts translations/grblControl_es.ts translations/grblControl_fr.ts
-
-win32: {
-    QMAKE_CXXFLAGS_DEBUG += -g3 -pg
-    QMAKE_LFLAGS_DEBUG += -pg -lgmon
-}

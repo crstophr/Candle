@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>913</width>
+    <width>878</width>
     <height>899</height>
    </rect>
   </property>
@@ -14,11 +14,11 @@
    <bool>true</bool>
   </property>
   <property name="windowTitle">
-   <string>grblControl</string>
+   <string>Candle</string>
   </property>
   <property name="windowIcon">
    <iconset resource="images.qrc">
-    <normaloff>:/images/icon3png.png</normaloff>:/images/icon3png.png</iconset>
+    <normaloff>:/images/candle_256.png</normaloff>:/images/candle_256.png</iconset>
   </property>
   <property name="styleSheet">
    <string notr="true">/*QWidget {
@@ -39,6 +39,10 @@ QGroupBox:disabled {
 
 QGroupBox[overrided=&quot;true&quot;] {
 	color: red;
+}
+
+QGroupBox[overrided=&quot;false&quot;] {
+	color: palette(windowtext);
 }
 
 QGroupBox[checkable=&quot;true&quot;]::title {
@@ -112,6 +116,9 @@ QSlider::handle:horizontal:hover {
   </property>
   <widget class="QWidget" name="centralWidget">
    <layout class="QHBoxLayout" name="horizontalLayout_5" stretch="100,1">
+    <property name="spacing">
+     <number>9</number>
+    </property>
     <property name="leftMargin">
      <number>9</number>
     </property>
@@ -159,25 +166,6 @@ QSlider::handle:horizontal:hover {
          <property name="toolTip">
           <string>Isometric view</string>
          </property>
-         <property name="styleSheet">
-          <string notr="true">QToolButton { /* all types of tool button */
-	color: lightgray;
-	border: 1px solid lightgray;
-	border-radius: 0px;
-	background-color: white;
-}
-
-QToolButton:hover { /* all types of tool button */
-	border: 1px solid gray;
-	color: gray;
-}
-
-QToolButton:pressed {
-}
-
-QToolButton:checked { /* all types of tool button */
-}</string>
-         </property>
          <property name="text">
           <string/>
          </property>
@@ -203,25 +191,6 @@ QToolButton:checked { /* all types of tool button */
          </property>
          <property name="toolTip">
           <string>Top view</string>
-         </property>
-         <property name="styleSheet">
-          <string notr="true">QToolButton { /* all types of tool button */
-	color: lightgray;
-	border: 1px solid lightgray;
-	border-radius: 0px;
-	background-color: white;
-}
-
-QToolButton:hover { /* all types of tool button */
-	border: 1px solid gray;
-	color: gray;
-}
-
-QToolButton:pressed {
-}
-
-QToolButton:checked { /* all types of tool button */
-}</string>
          </property>
          <property name="text">
           <string/>
@@ -249,25 +218,6 @@ QToolButton:checked { /* all types of tool button */
          <property name="toolTip">
           <string>Front view</string>
          </property>
-         <property name="styleSheet">
-          <string notr="true">QToolButton { /* all types of tool button */
-	color: lightgray;
-	border: 1px solid lightgray;
-	border-radius: 0px;
-	background-color: white;
-}
-
-QToolButton:hover { /* all types of tool button */
-	border: 1px solid gray;
-	color: gray;
-}
-
-QToolButton:pressed {
-}
-
-QToolButton:checked { /* all types of tool button */
-}</string>
-         </property>
          <property name="text">
           <string/>
          </property>
@@ -294,25 +244,6 @@ QToolButton:checked { /* all types of tool button */
          <property name="toolTip">
           <string>Left view</string>
          </property>
-         <property name="styleSheet">
-          <string notr="true">QToolButton { /* all types of tool button */
-	color: lightgray;
-	border: 1px solid lightgray;
-	border-radius: 0px;
-	background-color: white;
-}
-
-QToolButton:hover { /* all types of tool button */
-	border: 1px solid gray;
-	color: gray;
-}
-
-QToolButton:pressed {
-}
-
-QToolButton:checked { /* all types of tool button */
-}</string>
-         </property>
          <property name="text">
           <string/>
          </property>
@@ -338,25 +269,6 @@ QToolButton:checked { /* all types of tool button */
          </property>
          <property name="toolTip">
           <string>Fit</string>
-         </property>
-         <property name="styleSheet">
-          <string notr="true">QToolButton { /* all types of tool button */
-	color: lightgray;
-	border: 1px solid lightgray;
-	border-radius: 0px;
-	background-color: white;
-}
-
-QToolButton:hover { /* all types of tool button */
-	border: 1px solid gray;
-	color: gray;
-}
-
-QToolButton:pressed {
-}
-
-QToolButton:checked { /* all types of tool button */
-}</string>
          </property>
          <property name="text">
           <string/>
@@ -1082,7 +994,13 @@ QToolButton:checked { /* all types of tool button */
           </widget>
          </item>
          <item>
-          <widget class="QPushButton" name="cmdFileSend">
+          <widget class="QToolButton" name="cmdFileSend">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
            <property name="text">
             <string>Send</string>
            </property>
@@ -1122,6 +1040,9 @@ QToolButton:checked { /* all types of tool button */
           <property name="title">
            <string>State</string>
           </property>
+          <property name="overrided" stdset="0">
+           <bool>false</bool>
+          </property>
           <layout class="QVBoxLayout" name="verticalLayout_6">
            <property name="leftMargin">
             <number>8</number>
@@ -1158,6 +1079,9 @@ QToolButton:checked { /* all types of tool button */
                </property>
                <item>
                 <widget class="QLineEdit" name="txtWPosX">
+                 <property name="toolTip">
+                  <string>X</string>
+                 </property>
                  <property name="text">
                   <string>0</string>
                  </property>
@@ -1171,6 +1095,9 @@ QToolButton:checked { /* all types of tool button */
                </item>
                <item>
                 <widget class="QLineEdit" name="txtWPosY">
+                 <property name="toolTip">
+                  <string>Y</string>
+                 </property>
                  <property name="text">
                   <string>0</string>
                  </property>
@@ -1184,6 +1111,9 @@ QToolButton:checked { /* all types of tool button */
                </item>
                <item>
                 <widget class="QLineEdit" name="txtWPosZ">
+                 <property name="toolTip">
+                  <string>Z</string>
+                 </property>
                  <property name="text">
                   <string>0</string>
                  </property>
@@ -1222,6 +1152,9 @@ QToolButton:checked { /* all types of tool button */
                </property>
                <item>
                 <widget class="QLineEdit" name="txtMPosX">
+                 <property name="toolTip">
+                  <string>X</string>
+                 </property>
                  <property name="text">
                   <string>0</string>
                  </property>
@@ -1235,6 +1168,9 @@ QToolButton:checked { /* all types of tool button */
                </item>
                <item>
                 <widget class="QLineEdit" name="txtMPosY">
+                 <property name="toolTip">
+                  <string>Y</string>
+                 </property>
                  <property name="text">
                   <string>0</string>
                  </property>
@@ -1248,6 +1184,9 @@ QToolButton:checked { /* all types of tool button */
                </item>
                <item>
                 <widget class="QLineEdit" name="txtMPosZ">
+                 <property name="toolTip">
+                  <string>Z</string>
+                 </property>
                  <property name="text">
                   <string>0</string>
                  </property>
@@ -1310,6 +1249,9 @@ QToolButton:checked { /* all types of tool button */
          <widget class="QGroupBox" name="grpControl">
           <property name="title">
            <string>Control</string>
+          </property>
+          <property name="overrided" stdset="0">
+           <bool>false</bool>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout" stretch="0">
            <property name="leftMargin">
@@ -1434,7 +1376,7 @@ QToolButton:checked { /* all types of tool button */
               </widget>
              </item>
              <item row="1" column="1">
-              <widget class="StyledToolButton" name="cmdReturnXY">
+              <widget class="StyledToolButton" name="cmdRestoreOrigin">
                <property name="enabled">
                 <bool>false</bool>
                </property>
@@ -1445,14 +1387,14 @@ QToolButton:checked { /* all types of tool button */
                 </size>
                </property>
                <property name="toolTip">
-                <string>Restore XYZ</string>
+                <string>Restore origin</string>
                </property>
                <property name="text">
                 <string>...</string>
                </property>
                <property name="icon">
                 <iconset resource="images.qrc">
-                 <normaloff>:/images/axis_return.png</normaloff>:/images/axis_return.png</iconset>
+                 <normaloff>:/images/origin.png</normaloff>:/images/origin.png</iconset>
                </property>
                <property name="iconSize">
                 <size>
@@ -1463,7 +1405,7 @@ QToolButton:checked { /* all types of tool button */
               </widget>
              </item>
              <item row="1" column="2">
-              <widget class="StyledToolButton" name="cmdTopZ">
+              <widget class="StyledToolButton" name="cmdSafePosition">
                <property name="minimumSize">
                 <size>
                  <width>44</width>
@@ -1471,14 +1413,14 @@ QToolButton:checked { /* all types of tool button */
                 </size>
                </property>
                <property name="toolTip">
-                <string>Safe Z</string>
+                <string>Safe position</string>
                </property>
                <property name="text">
                 <string>...</string>
                </property>
                <property name="icon">
                 <iconset resource="images.qrc">
-                 <normaloff>:/images/safe_z.png</normaloff>:/images/safe_z.png</iconset>
+                 <normaloff>:/images/run.png</normaloff>:/images/run.png</iconset>
                </property>
                <property name="iconSize">
                 <size>
@@ -1594,7 +1536,7 @@ QToolButton:checked { /* all types of tool button */
             <x>0</x>
             <y>0</y>
             <width>231</width>
-            <height>638</height>
+            <height>725</height>
            </rect>
           </property>
           <property name="sizePolicy">
@@ -1617,12 +1559,177 @@ QToolButton:checked { /* all types of tool button */
             <number>0</number>
            </property>
            <item>
+            <widget class="GroupBox" name="grpUserCommands">
+             <property name="enabled">
+              <bool>true</bool>
+             </property>
+             <property name="title">
+              <string>User commands</string>
+             </property>
+             <property name="checkable">
+              <bool>true</bool>
+             </property>
+             <property name="overrided" stdset="0">
+              <bool>false</bool>
+             </property>
+             <layout class="QHBoxLayout" name="horizontalLayout_30">
+              <property name="spacing">
+               <number>9</number>
+              </property>
+              <property name="leftMargin">
+               <number>8</number>
+              </property>
+              <property name="topMargin">
+               <number>8</number>
+              </property>
+              <property name="rightMargin">
+               <number>8</number>
+              </property>
+              <property name="bottomMargin">
+               <number>8</number>
+              </property>
+              <item>
+               <widget class="QWidget" name="widgetUserCommands" native="true">
+                <layout class="QHBoxLayout" name="horizontalLayout_31">
+                 <property name="leftMargin">
+                  <number>0</number>
+                 </property>
+                 <property name="topMargin">
+                  <number>0</number>
+                 </property>
+                 <property name="rightMargin">
+                  <number>0</number>
+                 </property>
+                 <property name="bottomMargin">
+                  <number>0</number>
+                 </property>
+                 <item>
+                  <layout class="QGridLayout" name="gridLayout_7">
+                   <property name="horizontalSpacing">
+                    <number>8</number>
+                   </property>
+                   <item row="0" column="1">
+                    <widget class="StyledToolButton" name="cmdUser1">
+                     <property name="enabled">
+                      <bool>true</bool>
+                     </property>
+                     <property name="minimumSize">
+                      <size>
+                       <width>44</width>
+                       <height>44</height>
+                      </size>
+                     </property>
+                     <property name="toolTip">
+                      <string>Spindle on/off</string>
+                     </property>
+                     <property name="icon">
+                      <iconset resource="images.qrc">
+                       <normaloff>:/images/num2.png</normaloff>:/images/num2.png</iconset>
+                     </property>
+                     <property name="iconSize">
+                      <size>
+                       <width>30</width>
+                       <height>30</height>
+                      </size>
+                     </property>
+                    </widget>
+                   </item>
+                   <item row="0" column="3">
+                    <widget class="StyledToolButton" name="cmdUser3">
+                     <property name="enabled">
+                      <bool>true</bool>
+                     </property>
+                     <property name="minimumSize">
+                      <size>
+                       <width>44</width>
+                       <height>44</height>
+                      </size>
+                     </property>
+                     <property name="toolTip">
+                      <string>Spindle on/off</string>
+                     </property>
+                     <property name="icon">
+                      <iconset resource="images.qrc">
+                       <normaloff>:/images/num4.png</normaloff>:/images/num4.png</iconset>
+                     </property>
+                     <property name="iconSize">
+                      <size>
+                       <width>30</width>
+                       <height>30</height>
+                      </size>
+                     </property>
+                    </widget>
+                   </item>
+                   <item row="0" column="2">
+                    <widget class="StyledToolButton" name="cmdUser2">
+                     <property name="enabled">
+                      <bool>true</bool>
+                     </property>
+                     <property name="minimumSize">
+                      <size>
+                       <width>44</width>
+                       <height>44</height>
+                      </size>
+                     </property>
+                     <property name="toolTip">
+                      <string>Spindle on/off</string>
+                     </property>
+                     <property name="icon">
+                      <iconset resource="images.qrc">
+                       <normaloff>:/images/num3.png</normaloff>:/images/num3.png</iconset>
+                     </property>
+                     <property name="iconSize">
+                      <size>
+                       <width>30</width>
+                       <height>30</height>
+                      </size>
+                     </property>
+                    </widget>
+                   </item>
+                   <item row="0" column="0">
+                    <widget class="StyledToolButton" name="cmdUser0">
+                     <property name="enabled">
+                      <bool>true</bool>
+                     </property>
+                     <property name="minimumSize">
+                      <size>
+                       <width>44</width>
+                       <height>44</height>
+                      </size>
+                     </property>
+                     <property name="toolTip">
+                      <string>Spindle on/off</string>
+                     </property>
+                     <property name="icon">
+                      <iconset resource="images.qrc">
+                       <normaloff>:/images/num1.png</normaloff>:/images/num1.png</iconset>
+                     </property>
+                     <property name="iconSize">
+                      <size>
+                       <width>30</width>
+                       <height>30</height>
+                      </size>
+                     </property>
+                    </widget>
+                   </item>
+                  </layout>
+                 </item>
+                </layout>
+               </widget>
+              </item>
+             </layout>
+            </widget>
+           </item>
+           <item>
             <widget class="GroupBox" name="grpHeightMap">
              <property name="title">
               <string>Heightmap</string>
              </property>
              <property name="checkable">
               <bool>true</bool>
+             </property>
+             <property name="overrided" stdset="0">
+              <bool>false</bool>
              </property>
              <layout class="QVBoxLayout" name="verticalLayout_16">
               <property name="leftMargin">
@@ -1772,6 +1879,9 @@ QToolButton:checked { /* all types of tool button */
              </property>
              <property name="checkable">
               <bool>true</bool>
+             </property>
+             <property name="overrided" stdset="0">
+              <bool>false</bool>
              </property>
              <layout class="QHBoxLayout" name="horizontalLayout_2">
               <property name="leftMargin">
@@ -1991,6 +2101,9 @@ QToolButton:checked { /* all types of tool button */
              </property>
              <property name="checkable">
               <bool>true</bool>
+             </property>
+             <property name="overrided" stdset="0">
+              <bool>false</bool>
              </property>
              <layout class="QVBoxLayout" name="verticalLayout_11">
               <property name="leftMargin">
@@ -2274,13 +2387,10 @@ QDoubleSpinBox:focus {
                        <property name="orientation">
                         <enum>Qt::Horizontal</enum>
                        </property>
-                       <property name="sizeType">
-                        <enum>QSizePolicy::Expanding</enum>
-                       </property>
                        <property name="sizeHint" stdset="0">
                         <size>
                          <width>0</width>
-                         <height>0</height>
+                         <height>20</height>
                         </size>
                        </property>
                       </spacer>
@@ -2329,13 +2439,10 @@ QDoubleSpinBox:focus {
                        <property name="orientation">
                         <enum>Qt::Horizontal</enum>
                        </property>
-                       <property name="sizeType">
-                        <enum>QSizePolicy::Expanding</enum>
-                       </property>
                        <property name="sizeHint" stdset="0">
                         <size>
                          <width>0</width>
-                         <height>0</height>
+                         <height>20</height>
                         </size>
                        </property>
                       </spacer>
@@ -2626,7 +2733,7 @@ padding-right: 8;</string>
                   <number>5</number>
                  </property>
                  <property name="maxCount">
-                  <number>5</number>
+                  <number>10</number>
                  </property>
                  <property name="insertPolicy">
                   <enum>QComboBox::InsertAtTop</enum>
@@ -2685,7 +2792,7 @@ padding-right: 8;</string>
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>913</width>
+     <width>878</width>
      <height>26</height>
     </rect>
    </property>
@@ -2814,7 +2921,6 @@ padding-right: 8;</string>
   <tabstop>chkAutoScroll</tabstop>
   <tabstop>cmdFileOpen</tabstop>
   <tabstop>cmdFileReset</tabstop>
-  <tabstop>cmdFileSend</tabstop>
   <tabstop>cmdFilePause</tabstop>
   <tabstop>cmdFileAbort</tabstop>
   <tabstop>cmdTop</tabstop>
@@ -2850,8 +2956,8 @@ padding-right: 8;</string>
   <tabstop>cmdTouch</tabstop>
   <tabstop>cmdZeroXY</tabstop>
   <tabstop>cmdZeroZ</tabstop>
-  <tabstop>cmdReturnXY</tabstop>
-  <tabstop>cmdTopZ</tabstop>
+  <tabstop>cmdRestoreOrigin</tabstop>
+  <tabstop>cmdSafePosition</tabstop>
   <tabstop>cmdReset</tabstop>
   <tabstop>cmdUnlock</tabstop>
   <tabstop>scrollArea</tabstop>
@@ -2899,12 +3005,12 @@ padding-right: 8;</string>
    <slot>setDisabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>904</x>
-     <y>933</y>
+     <x>858</x>
+     <y>658</y>
     </hint>
     <hint type="destinationlabel">
-     <x>798</x>
-     <y>779</y>
+     <x>750</x>
+     <y>501</y>
     </hint>
    </hints>
   </connection>
@@ -2915,12 +3021,12 @@ padding-right: 8;</string>
    <slot>setDisabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>904</x>
-     <y>933</y>
+     <x>858</x>
+     <y>658</y>
     </hint>
     <hint type="destinationlabel">
-     <x>902</x>
-     <y>620</y>
+     <x>856</x>
+     <y>332</y>
     </hint>
    </hints>
   </connection>
@@ -2931,12 +3037,12 @@ padding-right: 8;</string>
    <slot>setDisabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>904</x>
-     <y>933</y>
+     <x>858</x>
+     <y>658</y>
     </hint>
     <hint type="destinationlabel">
-     <x>903</x>
-     <y>646</y>
+     <x>857</x>
+     <y>361</y>
     </hint>
    </hints>
   </connection>
@@ -2947,12 +3053,12 @@ padding-right: 8;</string>
    <slot>setDisabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>904</x>
-     <y>933</y>
+     <x>858</x>
+     <y>658</y>
     </hint>
     <hint type="destinationlabel">
-     <x>852</x>
-     <y>533</y>
+     <x>805</x>
+     <y>237</y>
     </hint>
    </hints>
   </connection>
@@ -2963,12 +3069,12 @@ padding-right: 8;</string>
    <slot>setDisabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>904</x>
-     <y>933</y>
+     <x>858</x>
+     <y>658</y>
     </hint>
     <hint type="destinationlabel">
-     <x>853</x>
-     <y>559</y>
+     <x>806</x>
+     <y>266</y>
     </hint>
    </hints>
   </connection>
@@ -2979,12 +3085,44 @@ padding-right: 8;</string>
    <slot>setDisabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>904</x>
-     <y>933</y>
+     <x>858</x>
+     <y>658</y>
     </hint>
     <hint type="destinationlabel">
-     <x>474</x>
-     <y>700</y>
+     <x>512</x>
+     <y>570</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>chkKeyboardControl</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>grpHeightMapSettings</receiver>
+   <slot>setDisabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>748</x>
+     <y>648</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>206</x>
+     <y>724</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>chkKeyboardControl</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>tblHeightMap</receiver>
+   <slot>setDisabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>793</x>
+     <y>651</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>203</x>
+     <y>613</y>
     </hint>
    </hints>
   </connection>

@@ -1,4 +1,4 @@
-grblControl
+Candle
 -----------
 GRBL controller application with G-Code visualizer written in Qt.
 
@@ -8,25 +8,46 @@ Supported functions:
 * Loading, editing, saving and sending of G-code files to cnc-machine.
 * Visualizing G-code files.
 
-Version 0.8 release:
+Version 1.1 pre-release:
 --------------------
-* You can save files, transformed according to heightmap.
-* Console window have adjustable size now.
-* Added "Degree" minimum arc size to parser settings.
-* Some minor bugs fixed.
+
+* Moving to Grbl v1.1 firmware
 
 Downloads:
 ----------
-* Windows: [grblControl_0.8.1.zip](https://github.com/Denvi/grblControl/releases/download/v0.8.1/grblControl_0.8.1.zip)
-* Linux: [grblControl_0.8.1.tar.gz](https://github.com/Denvi/grblControl/releases/download/v0.8.1/grblControl_0.8.1.tar.gz)
+* Windows: [candle_1.1.5.zip](https://github.com/Denvi/Candle/releases/download/v1.1/Candle_1.1.5.zip)
+* Linux: [candle_1.1.5.tar.gz](https://github.com/Denvi/Candle/releases/download/v1.1/Candle_1.1.5.tar.gz)
 
-Translations will be available from here: [translations](https://github.com/Denvi/grblControl/tree/0.8/translations)
+
+Version 1.0 release:
+--------------------
+
+* Added "Grayscale segments"-option and "Raster"-mode to visualize laser jobs.
+* Added "User commands"-panel.
+* Significantly improved performance of:
+ * File loading.
+ * G-code program modification by heightmap.
+ * "Autoscroll"-feature.
+* Programs with about 5 million lines can be loaded now.
+
+Downloads:
+----------
+* Windows: [candle_1.0.9.zip](https://github.com/Denvi/Candle/releases/download/v1.0/Candle_1.0.9.zip)
+* Linux: [candle_1.0.9.tar.gz](https://github.com/Denvi/Candle/releases/download/v1.0/Candle_1.0.9.tar.gz)
+
+Build requirements:
+------------------
+Qt 5.4.2 with MinGW/GCC compiler
 
 Previous versions:
+-----------------
+0.9
+* Windows: [candle_0.9.zip](https://github.com/Denvi/Candle/releases/download/v0.9/Candle_0.9.zip)
+* Linux: [candle_0.9.tar.gz](https://github.com/Denvi/Candle/releases/download/v0.9/Candle_0.9.tar.gz)
 
-0.8:
-* Windows: [grblControl_0.8.zip](https://github.com/Denvi/grblControl/releases/download/v0.8/grblControl_0.8.zip)
-* Linux: [grblControl_0.8.tar.gz](https://github.com/Denvi/grblControl/releases/download/v0.8/grblControl_0.8.tar.gz)
+0.8.4
+* Windows: [grblControl_0.8.4.zip](https://github.com/Denvi/grblControl/releases/download/v0.8.4/grblControl_0.8.4.zip)
+* Linux: [grblControl_0.8.4.tar.gz](https://github.com/Denvi/grblControl/releases/download/v0.8.4/grblControl_0.8.4.tar.gz)
 
 0.7:
 * Windows: [grblControl_0.7.zip](https://github.com/Denvi/grblControl/releases/download/0.7/grblControl_0.7.zip)
@@ -41,6 +62,13 @@ Previous versions:
 * Windows XP: [grblControl_0.5.2_xp.zip](https://github.com/Denvi/grblControl/releases/download/0.5.2/grblControl_0.5.2_xp.zip)
 * Linux: [grblControl_0.5.2.tar.gz](https://github.com/Denvi/grblControl/releases/download/0.5.2/grblControl_0.5.2.tar.gz)
 
+
+Version 0.9 release:
+--------------------
+* "Restore origin" function has "move tool in plane/space" setting now.
+* "Safe position" function can be customized with command list.
+* Visualizer works with OpenGL/Angle/Software renderer.
+* Some bugs fixed.
 
 Version 0.7 release:
 --------------------
@@ -103,3 +131,8 @@ Version 0.2 release:
 * Some bugs fixed.
 
 ![screenshot](/screenshots/screenshot.png)
+
+--------------------
+Support the "grblControl" project. If you'd like to donate, all proceeds will be used to help fund supporting hardware and testing equipment. Thank you.
+
+[![Donate](https://www.paypalobjects.com/en_US/i/btn/btn_donate_LG.gif)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=NQG6CB4VGTVZE) / [![Donate](https://www.paypalobjects.com/ru_RU/i/btn/btn_donate_LG.gif)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=6GRUNTKF2M4BU) 

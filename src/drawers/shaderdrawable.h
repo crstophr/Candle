@@ -6,6 +6,7 @@
 #include <QOpenGLShaderProgram>
 #include <QOpenGLBuffer>
 #include <QOpenGLVertexArrayObject>
+#include <QOpenGLTexture>
 #include "utils/util.h"
 
 struct VertexData
@@ -50,17 +51,18 @@ protected:
     bool m_visible;
     QVector<VertexData> m_lines;
     QVector<VertexData> m_points;
+    QVector<VertexData> m_triangles;
+    QOpenGLTexture *m_texture;
 
     QOpenGLBuffer m_vbo; // Protected for direct vbo access
 
     virtual bool updateData();
+    void init();
 
 private:
     QOpenGLVertexArrayObject m_vao;
 
     bool m_needsUpdateGeometry;
-
-    void init();
 };
 
 #endif // SHADERDRAWABLE_H

@@ -1,8 +1,7 @@
-// This file is a part of "grblControl" application.
-// Copyright 2015 Hayrullin Denis Ravilevich
+// This file is a part of "Candle" application.
+// Copyright 2015-2016 Hayrullin Denis Ravilevich
 
 #include "tooldrawer.h"
-#include "math.h"
 
 ToolDrawer::ToolDrawer()
 {

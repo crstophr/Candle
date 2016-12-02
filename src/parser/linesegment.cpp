@@ -1,15 +1,14 @@
-// This file is a part of "grblControl" application.
+// This file is a part of "Candle" application.
 // This file was originally ported from "LineSegment.java" class
 // of "Universal GcodeSender" application written by Will Winder
 // (https://github.com/winder/Universal-G-Code-Sender)
 
-// Copyright 2015 Hayrullin Denis Ravilevich
+// Copyright 2015-2016 Hayrullin Denis Ravilevich
 
 #include "linesegment.h"
 #include <QDebug>
 
-LineSegment::LineSegment(QObject *parent) :
-    QObject(parent)
+LineSegment::LineSegment()
 {
     m_toolhead = 0; //DEFAULT TOOLHEAD ASSUMED TO BE 0!
     m_isZMovement = false;
@@ -80,7 +79,7 @@ QList<double> LineSegment::getPoints()
     return points;
 }
 
-QVector3D LineSegment::getStart() {
+QVector3D &LineSegment::getStart() {
     return this->m_first;
 }
 
@@ -89,7 +88,7 @@ void LineSegment::setStart(QVector3D vector)
     m_first = vector;
 }
 
-QVector3D LineSegment::getEnd() {
+QVector3D &LineSegment::getEnd() {
     return this->m_second;
 }
 
@@ -140,7 +139,7 @@ bool LineSegment::isFastTraverse() {
     return this->m_isFastTraverse;
 }
 
-bool LineSegment::contains(QVector3D point)
+bool LineSegment::contains(const QVector3D &point)
 {
     double delta;
     QVector3D line = this->getEnd() - this->getStart();
@@ -187,6 +186,7 @@ void LineSegment::setIsHightlight(bool isHightlight)
 {
     m_isHightlight = isHightlight;
 }
+
 int LineSegment::vertexIndex() const
 {
     return m_vertexIndex;
@@ -195,6 +195,46 @@ int LineSegment::vertexIndex() const
 void LineSegment::setVertexIndex(int vertexIndex)
 {
     m_vertexIndex = vertexIndex;
+}
+
+double LineSegment::getSpindleSpeed() const
+{
+    return m_spindleSpeed;
+}
+
+void LineSegment::setSpindleSpeed(double spindleSpeed)
+{
+    m_spindleSpeed = spindleSpeed;
+}
+
+double LineSegment::getDwell() const
+{
+    return m_dwell;
+}
+
+void LineSegment::setDwell(double dwell)
+{
+    m_dwell = dwell;
+}
+
+bool LineSegment::isClockwise() const
+{
+    return m_isClockwise;
+}
+
+void LineSegment::setIsClockwise(bool isClockwise)
+{
+    m_isClockwise = isClockwise;
+}
+
+PointSegment::planes LineSegment::plane() const
+{
+    return m_plane;
+}
+
+void LineSegment::setPlane(const PointSegment::planes &plane)
+{
+    m_plane = plane;
 }
 
 

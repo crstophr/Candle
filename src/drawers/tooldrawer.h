@@ -1,5 +1,5 @@
-// This file is a part of "grblControl" application.
-// Copyright 2015 Hayrullin Denis Ravilevich
+// This file is a part of "Candle" application.
+// Copyright 2015-2016 Hayrullin Denis Ravilevich
 
 #ifndef TOOLDRAWER_H
 #define TOOLDRAWER_H
@@ -7,6 +7,7 @@
 #include <QVector3D>
 #include <QTimer>
 #include <QColor>
+#include <cmath>
 #include "shaderdrawable.h"
 
 class ToolDrawer : public ShaderDrawable

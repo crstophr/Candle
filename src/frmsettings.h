@@ -1,10 +1,11 @@
-// This file is a part of "grblControl" application.
-// Copyright 2015 Hayrullin Denis Ravilevich
+// This file is a part of "Candle" application.
+// Copyright 2015-2016 Hayrullin Denis Ravilevich
 
 #ifndef FRMSETTINGS_H
 #define FRMSETTINGS_H
 
 #include <QDialog>
+#include <QMessageBox>
 #include <QListWidgetItem>
 #include "widgets/colorpicker.h"
 
@@ -48,12 +49,20 @@ public:
     void setShowProgramCommands(bool showProgramCommands);
     bool showUICommands();
     void setShowUICommands(bool showUICommands);
-    double safeZ();
-    void setSafeZ(double safeZ);
+    QString safePositionCommand();
+    void setSafePositionCommand(QString command);
+    bool moveOnRestore();
+    void setMoveOnRestore(bool value);
+    int restoreMode();
+    void setRestoreMode(int value);
     int spindleSpeedMin();
     void setSpindleSpeedMin(int speed);
     int spindleSpeedMax();
     void setSpindleSpeedMax(int speed);
+    int laserPowerMin();
+    void setLaserPowerMin(int value);
+    int laserPowerMax();
+    void setLaserPowerMax(int value);
     int rapidSpeed();
     void setRapidSpeed(int rapidSpeed);
     int heightmapProbingFeed();
@@ -68,6 +77,8 @@ public:
     void setToolAngle(double toolAngle);
     int fps();
     void setFps(int fps);
+    bool vsync();
+    void setVsync(bool value);
     bool msaa();
     void setMsaa(bool msaa);
     bool autoCompletion();
@@ -80,6 +91,8 @@ public:
     void setSimplify(bool simplify);
     double simplifyPrecision();
     void setSimplifyPrecision(double simplifyPrecision);
+    bool panelUserCommands();
+    void setPanelUserCommands(bool value);
     bool panelHeightmap();
     void setPanelHeightmap(bool panelHeightmap);
     bool panelSpindle();
@@ -92,6 +105,18 @@ public:
     QColor colors(QString name);
     int fontSize();
     void setFontSize(int fontSize);
+    bool grayscaleSegments();
+    void setGrayscaleSegments(bool value);
+    bool grayscaleSCode();
+    void setGrayscaleSCode(bool value);
+    bool drawModeVectors();
+    void setDrawModeVectors(bool value);
+    QString userCommands(int index);
+    void setUserCommands(int index, QString commands);
+    bool ignoreErrors();
+    void setIgnoreErrors(bool value);
+    bool autoLine();
+    void setAutoLine(bool value);
 
 protected:
     void showEvent(QShowEvent *se);
@@ -108,6 +133,14 @@ private slots:
     void on_cmdDefaults_clicked();
 
     void on_cboFontSize_currentTextChanged(const QString &arg1);
+
+    void on_radDrawModeVectors_toggled(bool checked);
+
+    void on_radDrawModeRaster_toggled(bool checked);
+
+    void on_radGrayscaleS_toggled(bool checked);
+
+    void on_radGrayscaleZ_toggled(bool checked);
 
 private:
     Ui::frmSettings *ui;

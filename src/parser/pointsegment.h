@@ -1,21 +1,19 @@
-// This file is a part of "grblControl" application.
+// This file is a part of "Candle" application.
 // This file was originally ported from "PointSegment.java" class
 // of "Universal GcodeSender" application written by Will Winder
 // (https://github.com/winder/Universal-G-Code-Sender)
 
-// Copyright 2015 Hayrullin Denis Ravilevich
+// Copyright 2015-2016 Hayrullin Denis Ravilevich
 
 #ifndef POINTSEGMENT_H
 #define POINTSEGMENT_H
 
-#include <QObject>
 #include <QVector3D>
 
 #include "arcproperties.h"
 
-class PointSegment : public QObject
+class PointSegment
 {
-    Q_OBJECT
 public:
     enum planes {
         XY,
@@ -23,7 +21,7 @@ public:
         YZ
     };
 
-    PointSegment(QObject *parent = 0);
+    PointSegment();
     PointSegment(PointSegment *ps);
     PointSegment(const QVector3D *b, int num);
     PointSegment(QVector3D *point, int num, QVector3D *center, double radius, bool clockwise);
@@ -61,14 +59,18 @@ public:
     planes plane() const;
     void setPlane(const planes &plane);
 
-signals:
+    double getSpindleSpeed() const;
+    void setSpindleSpeed(double spindleSpeed);
 
-public slots:
+    double getDwell() const;
+    void setDwell(double dwell);
 
 private:
     ArcProperties *m_arcProperties;
     int m_toolhead;
     double m_speed;
+    double m_spindleSpeed;
+    double m_dwell;
     QVector3D *m_point;
     bool m_isMetric;
     bool m_isZMovement;

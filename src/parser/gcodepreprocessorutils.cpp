@@ -1,16 +1,16 @@
-// This file is a part of "grblControl" application.
+// This file is a part of "Candle" application.
 // This file was originally ported from "GcodePreprocessorUtils.java" class
 // of "Universal GcodeSender" application written by Will Winder
 // (https://github.com/winder/Universal-G-Code-Sender)
 
-// Copyright 2015 Hayrullin Denis Ravilevich
+// Copyright 2015-2016 Hayrullin Denis Ravilevich
 
 #include <QRegExp>
 #include <QDebug>
 #include <QVector3D>
 #include "gcodepreprocessorutils.h"
-#include "math.h"
 #include "limits"
+#include "../tables/gcodetablemodel.h"
 
 /**
 * Searches the command string for an 'f' and replaces the speed value
@@ -20,7 +20,7 @@
 */
 QString GcodePreprocessorUtils::overrideSpeed(QString command, double speed, double *original)
 {
-    QRegExp re("[Ff]([0-9.]+)");
+    static QRegExp re("[Ff]([0-9.]+)");
 
     if (re.indexIn(command) != -1) {
         command.replace(re, QString("F%1").arg(re.cap(1).toDouble() / 100 * speed));
@@ -36,11 +36,14 @@ QString GcodePreprocessorUtils::overrideSpeed(QString command, double speed, dou
 */
 QString GcodePreprocessorUtils::removeComment(QString command)
 {
+    static QRegExp rx1("\\(+[^\\(]*\\)+");
+    static QRegExp rx2(";.*");
+
     // Remove any comments within ( parentheses ) using regex "\([^\(]*\)"
-    command.replace(QRegExp("\\(+[^\\(]*\\)+"), "");
+    if (command.contains('(')) command.remove(rx1);
 
     // Remove any comment beginning with ';' using regex ";.*"
-    command.replace(QRegExp(";.*"), "");
+    if (command.contains(';')) command.remove(rx2);
 
     return command.trimmed();
 }
@@ -54,7 +57,7 @@ QString GcodePreprocessorUtils::parseComment(QString command)
     // "(?<=\()[^\(\)]*|(?<=\;)[^;]*"
     // "(?<=\\()[^\\(\\)]*|(?<=\\;)[^;]*"
 
-    QRegExp re("(\\([^\\(\\)]*\\)|;[^;].*)");
+    static QRegExp re("(\\([^\\(\\)]*\\)|;[^;].*)");
 
     if (re.indexIn(command) != -1) {
         return re.cap(1);
@@ -64,7 +67,7 @@ QString GcodePreprocessorUtils::parseComment(QString command)
 
 QString GcodePreprocessorUtils::truncateDecimals(int length, QString command)
 {
-    QRegExp re("(\\d*\\.\\d*)");
+    static QRegExp re("(\\d*\\.\\d*)");
     int pos = 0;
 
     while ((pos = re.indexIn(command, pos)) != -1)
@@ -79,15 +82,17 @@ QString GcodePreprocessorUtils::truncateDecimals(int length, QString command)
 
 QString GcodePreprocessorUtils::removeAllWhitespace(QString command)
 {
-    return command.replace(QRegExp("\\s"),"");
+    static QRegExp rx("\\s");
+
+    return command.remove(rx);
 }
 
-QList<QString> GcodePreprocessorUtils::parseCodes(QList<QString> args, char code)
+QList<float> GcodePreprocessorUtils::parseCodes(const QStringList &args, char code)
 {
-    QList<QString> l;
+    QList<float> l;
 
     foreach (QString s, args) {
-        if (s.length() > 0 && s[0].toUpper() == code) l.append(s.mid(1));
+        if (s.length() > 0 && s[0].toUpper() == code) l.append(s.mid(1).toDouble());
     }
 
     return l;
@@ -95,7 +100,7 @@ QList<QString> GcodePreprocessorUtils::parseCodes(QList<QString> args, char code
 
 QList<int> GcodePreprocessorUtils::parseGCodes(QString command)
 {
-    QRegExp re("[Gg]0*(\\d+)");
+    static QRegExp re("[Gg]0*(\\d+)");
 
     QList<int> codes;
     int pos = 0;
@@ -110,7 +115,7 @@ QList<int> GcodePreprocessorUtils::parseGCodes(QString command)
 
 QList<int> GcodePreprocessorUtils::parseMCodes(QString command)
 {
-    QRegExp re("[Mm]0*(\\d+)");
+    static QRegExp re("[Mm]0*(\\d+)");
 
     QList<int> codes;
     int pos = 0;
@@ -126,37 +131,35 @@ QList<int> GcodePreprocessorUtils::parseMCodes(QString command)
 /**
 * Update a point given the arguments of a command.
 */
-QVector3D GcodePreprocessorUtils::updatePointWithCommand(QString command, QVector3D initial, bool absoluteMode)
+QVector3D GcodePreprocessorUtils::updatePointWithCommand(const QString &command, const QVector3D &initial, bool absoluteMode)
 {
-    QList<QString> l = splitCommand(command);
+    QStringList l = splitCommand(command);
     return updatePointWithCommand(l, initial, absoluteMode);
 }
 
 /**
 * Update a point given the arguments of a command, using a pre-parsed list.
 */
-QVector3D GcodePreprocessorUtils::updatePointWithCommand(QList<QString> commandArgs, QVector3D initial, bool absoluteMode)
+QVector3D GcodePreprocessorUtils::updatePointWithCommand(const QStringList &commandArgs, const QVector3D &initial,
+                                                         bool absoluteMode)
 {
-    double x = NAN;
-    double y = NAN;
-    double z = NAN;
+    double x = qQNaN();
+    double y = qQNaN();
+    double z = qQNaN();
     char c;
 
     for (int i = 0; i < commandArgs.length(); i++) {
-
-//    foreach (QString t, commandArgs)
-//    {
-        if (commandArgs[i].length() > 0) {
-            c = commandArgs[i][0].toUpper().toLatin1();
+        if (commandArgs.at(i).length() > 0) {
+            c = commandArgs.at(i).at(0).toUpper().toLatin1();
             switch (c) {
             case 'X':
-                x = commandArgs[i].mid(1).toDouble();
+                x = commandArgs.at(i).mid(1).toDouble();;
                 break;
             case 'Y':
-                y = commandArgs[i].mid(1).toDouble();
+                y = commandArgs.at(i).mid(1).toDouble();;
                 break;
             case 'Z':
-                z = commandArgs[i].mid(1).toDouble();
+                z = commandArgs.at(i).mid(1).toDouble();;
                 break;
             }
         }
@@ -168,29 +171,29 @@ QVector3D GcodePreprocessorUtils::updatePointWithCommand(QList<QString> commandA
 /**
 * Update a point given the new coordinates.
 */
-QVector3D GcodePreprocessorUtils::updatePointWithCommand(QVector3D initial, double x, double y, double z, bool absoluteMode)
+QVector3D GcodePreprocessorUtils::updatePointWithCommand(const QVector3D &initial, double x, double y, double z, bool absoluteMode)
 {
     QVector3D newPoint(initial.x(), initial.y(), initial.z());
 
     if (absoluteMode) {
-        if (!std::isnan(x)) newPoint.setX(x);
-        if (!std::isnan(y)) newPoint.setY(y);
-        if (!std::isnan(z)) newPoint.setZ(z);
+        if (!qIsNaN(x)) newPoint.setX(x);
+        if (!qIsNaN(y)) newPoint.setY(y);
+        if (!qIsNaN(z)) newPoint.setZ(z);
     } else {
-        if (!std::isnan(x)) newPoint.setX(newPoint.x() + x);
-        if (!std::isnan(y)) newPoint.setY(newPoint.y() + y);
-        if (!std::isnan(z)) newPoint.setZ(newPoint.z() + z);
+        if (!qIsNaN(x)) newPoint.setX(newPoint.x() + x);
+        if (!qIsNaN(y)) newPoint.setY(newPoint.y() + y);
+        if (!qIsNaN(z)) newPoint.setZ(newPoint.z() + z);
     }
 
     return newPoint;
 }
 
-QVector3D GcodePreprocessorUtils::updateCenterWithCommand(QList<QString> commandArgs, QVector3D initial, QVector3D nextPoint, bool absoluteIJKMode, bool clockwise)
+QVector3D GcodePreprocessorUtils::updateCenterWithCommand(QStringList commandArgs, QVector3D initial, QVector3D nextPoint, bool absoluteIJKMode, bool clockwise)
 {
-    double i = NAN;
-    double j = NAN;
-    double k = NAN;
-    double r = NAN;
+    double i = qQNaN();
+    double j = qQNaN();
+    double k = qQNaN();
+    double r = qQNaN();
     char c;
 
     foreach (QString t, commandArgs)
@@ -214,7 +217,7 @@ QVector3D GcodePreprocessorUtils::updateCenterWithCommand(QList<QString> command
         }
     }
 
-    if (std::isnan(i) && std::isnan(j) && std::isnan(k)) {
+    if (qIsNaN(i) && qIsNaN(j) && qIsNaN(k)) {
         return convertRToCenter(initial, nextPoint, r, absoluteIJKMode, clockwise);
     }
 
@@ -226,13 +229,13 @@ QString GcodePreprocessorUtils::generateG1FromPoints(QVector3D start, QVector3D 
     QString sb("G1");
 
     if (absoluteMode) {
-        if (!std::isnan(end.x())) sb.append("X" + QString::number(end.x(), 'f', precision));
-        if (!std::isnan(end.y())) sb.append("Y" + QString::number(end.y(), 'f', precision));
-        if (!std::isnan(end.z())) sb.append("Z" + QString::number(end.z(), 'f', precision));
+        if (!qIsNaN(end.x())) sb.append("X" + QString::number(end.x(), 'f', precision));
+        if (!qIsNaN(end.y())) sb.append("Y" + QString::number(end.y(), 'f', precision));
+        if (!qIsNaN(end.z())) sb.append("Z" + QString::number(end.z(), 'f', precision));
     } else {
-        if (!std::isnan(end.x())) sb.append("X" + QString::number(end.x() - start.x(), 'f', precision));
-        if (!std::isnan(end.y())) sb.append("Y" + QString::number(end.y() - start.y(), 'f', precision));
-        if (!std::isnan(end.z())) sb.append("Z" + QString::number(end.z() - start.z(), 'f', precision));
+        if (!qIsNaN(end.x())) sb.append("X" + QString::number(end.x() - start.x(), 'f', precision));
+        if (!qIsNaN(end.y())) sb.append("Y" + QString::number(end.y() - start.y(), 'f', precision));
+        if (!qIsNaN(end.z())) sb.append("Z" + QString::number(end.z() - start.z(), 'f', precision));
     }
 
     return sb;
@@ -243,8 +246,8 @@ QString GcodePreprocessorUtils::generateG1FromPoints(QVector3D start, QVector3D 
 //* This command is about the same speed as the string.split(" ") command,
 //* but might be a little faster using precompiled regex.
 //*/
-QList<QString> GcodePreprocessorUtils::splitCommand(QString command) {    
-    QList<QString> l;
+QStringList GcodePreprocessorUtils::splitCommand(const QString &command) {
+    QStringList l;
     bool readNumeric = false;
     QString sb;
 
@@ -291,7 +294,7 @@ QList<QString> GcodePreprocessorUtils::splitCommand(QString command) {
 
 // TODO: Replace everything that uses this with a loop that loops through
 // the string and creates a hash with all the values.
-double GcodePreprocessorUtils::parseCoord(QList<QString> argList, char c)
+double GcodePreprocessorUtils::parseCoord(QStringList argList, char c)
 {
 //    int n = argList.length();
 
@@ -303,7 +306,7 @@ double GcodePreprocessorUtils::parseCoord(QList<QString> argList, char c)
     {
         if (t.length() > 0 && t[0].toUpper() == c) return t.mid(1).toDouble();
     }
-    return NAN;
+    return qQNaN();
 }
 
 //static public List<String> convertArcsToLines(Point3d start, Point3d end) {
@@ -433,7 +436,7 @@ QList<QVector3D> GcodePreprocessorUtils::generatePointsAlongArcBDring(PointSegme
     center = m * center;
 
     // Check center
-    if (std::isnan(center.length())) return QList<QVector3D>();
+    if (qIsNaN(center.length())) return QList<QVector3D>();
 
     // Calculate radius if necessary.
     if (radius == 0) {

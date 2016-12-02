@@ -1,5 +1,5 @@
-// This file is a part of "grblControl" application.
-// Copyright 2015 Hayrullin Denis Ravilevich
+// This file is a part of "Candle" application.
+// Copyright 2015-2016 Hayrullin Denis Ravilevich
 
 #ifndef GLWIDGET_H
 #define GLWIDGET_H
@@ -17,7 +17,7 @@
 #ifdef GLES
 class GLWidget : public QOpenGLWidget
 #else
-class GLWidget : public QGLWidget
+class GLWidget : public QGLWidget, protected QOpenGLFunctions
 #endif
 {
     Q_OBJECT
@@ -68,6 +68,12 @@ public:
     QColor colorText() const;
     void setColorText(const QColor &colorText);
 
+    double pointSize() const;
+    void setPointSize(double pointSize);
+
+    bool vsync() const;
+    void setVsync(bool vsync);
+
 signals:
     void rotationChanged();
     void resized();
@@ -87,16 +93,18 @@ private:
     double m_distance;
     double m_xMin, m_xMax, m_yMin, m_yMax, m_zMin, m_zMax, m_xSize, m_ySize, m_zSize;
     double m_lineWidth;
+    double m_pointSize;
     bool m_antialiasing;
     bool m_msaa;
+    bool m_vsync;
     bool m_zBuffer;
     int m_frames = 0;
     int m_fps = 0;
     int m_targetFps;
     int m_animationFrame;
     QTime m_spendTime;
-    QTime m_estimatedTime;    
-    QBasicTimer m_timerAnimation;
+    QTime m_estimatedTime;
+    QBasicTimer m_timerPaint;
     double m_xRotTarget, m_yRotTarget;
     double m_xRotStored, m_yRotStored;
     bool m_animateView;
@@ -105,7 +113,7 @@ private:
     bool m_updatesEnabled;
 
     double normalizeAngle(double angle);
-    double calculateVolume(QVector3D size);    
+    double calculateVolume(QVector3D size);
     void beginViewAnimation();
     void stopViewAnimation();
 

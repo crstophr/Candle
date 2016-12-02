@@ -1,15 +1,15 @@
-// This file is a part of "grblControl" application.
+// This file is a part of "Candle" application.
 // This file was originally ported from "PointSegment.java" class
 // of "Universal GcodeSender" application written by Will Winder
 // (https://github.com/winder/Universal-G-Code-Sender)
 
-// Copyright 2015 Hayrullin Denis Ravilevich
+// Copyright 2015-2016 Hayrullin Denis Ravilevich
 
 #include <QVector>
 
 #include "pointsegment.h"
 
-PointSegment::PointSegment(QObject *parent) : QObject(parent)
+PointSegment::PointSegment()
 {
     m_toolhead = 0;
     m_isMetric = true;
@@ -20,23 +20,25 @@ PointSegment::PointSegment(QObject *parent) : QObject(parent)
     m_lineNumber = -1;
     m_arcProperties = NULL;
     m_speed = 0;
+    m_spindleSpeed = 0;
+    m_dwell = 0;
     m_plane = XY;
 }
 
 PointSegment::PointSegment(PointSegment *ps) : PointSegment(ps->point(), ps->getLineNumber())
 {
-    this->setToolHead(ps->getToolhead());
-    this->setSpeed(ps->getSpeed());
-    this->setIsMetric(ps->isMetric());
-    this->setIsZMovement(ps->isZMovement());
-    this->setIsFastTraverse(ps->isFastTraverse());
-    this->setIsAbsolute(ps->isAbsolute());
+    this->m_toolhead = ps->getToolhead();
+    this->m_speed = ps->getSpeed();
+    this->m_isMetric = ps->isMetric();
+    this->m_isZMovement = ps->isZMovement();
+    this->m_isFastTraverse = ps->isFastTraverse();
+    this->m_isAbsolute = ps->isAbsolute();
 
     if (ps->isArc()) {
         this->setArcCenter(ps->center());
         this->setRadius(ps->getRadius());
         this->setIsClockwise(ps->isClockwise());
-        this->setPlane(ps->plane());
+        this->m_plane = ps->plane();
     }
 }
 
@@ -217,6 +219,26 @@ PointSegment::planes PointSegment::plane() const
 void PointSegment::setPlane(const planes &plane)
 {
     m_plane = plane;
+}
+
+double PointSegment::getSpindleSpeed() const
+{
+    return m_spindleSpeed;
+}
+
+void PointSegment::setSpindleSpeed(double spindleSpeed)
+{
+    m_spindleSpeed = spindleSpeed;
+}
+
+double PointSegment::getDwell() const
+{
+    return m_dwell;
+}
+
+void PointSegment::setDwell(double dwell)
+{
+    m_dwell = dwell;
 }
 
 

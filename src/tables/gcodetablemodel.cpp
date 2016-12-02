@@ -1,15 +1,7 @@
-// This file is a part of "grblControl" application.
-// Copyright 2015 Hayrullin Denis Ravilevich
+// This file is a part of "Candle" application.
+// Copyright 2015-2016 Hayrullin Denis Ravilevich
 
 #include "gcodetablemodel.h"
-
-//GCodeItem::GCodeItem()
-//{
-//    this->command = "";
-//    this->state = "";
-//    this->status = "";
-//    this->line = 0;
-//}
 
 GCodeTableModel::GCodeTableModel(QObject *parent) :
     QAbstractTableModel(parent)
@@ -26,12 +18,20 @@ QVariant GCodeTableModel::data(const QModelIndex &index, int role) const
     if (role == Qt::DisplayRole || role == Qt::EditRole) {
         switch (index.column())
         {
-        case 0: return index.row() == this->rowCount() - 1 ? "" : QString::number(index.row() + 1);
-        case 1: return m_data.at(index.row())->command;
-        case 2: return m_data.at(index.row())->state;
-        case 3: return m_data.at(index.row())->status;
-        case 4: return m_data.at(index.row())->line;
-        case 5: return QVariant(m_data.at(index.row())->args);
+        case 0: return index.row() == this->rowCount() - 1 ? QString() : QString::number(index.row() + 1);
+        case 1: return m_data.at(index.row()).command;
+        case 2:
+            if (index.row() == this->rowCount() - 1) return QString();
+            switch (m_data.at(index.row()).state) {
+            case GCodeItem::InQueue: return tr("In queue");
+            case GCodeItem::Sent: return tr("Sent");
+            case GCodeItem::Processed: return tr("Processed");
+            case GCodeItem::Skipped: return tr("Skipped");
+            }
+            return tr("Unknown");
+        case 3: return m_data.at(index.row()).response;
+        case 4: return m_data.at(index.row()).line;
+        case 5: return QVariant(m_data.at(index.row()).args);
         }
     }
 
@@ -51,11 +51,11 @@ bool GCodeTableModel::setData(const QModelIndex &index, const QVariant &value, i
         switch (index.column())
         {
         case 0: return false;
-        case 1: m_data.at(index.row())->command = value.toString(); break;
-        case 2: m_data.at(index.row())->state = value.toString(); break;
-        case 3: m_data.at(index.row())->status = value.toString(); break;
-        case 4: m_data.at(index.row())->line = value.toInt(); break;
-        case 5: m_data.at(index.row())->args = value.toStringList(); break;
+        case 1: m_data[index.row()].command = value.toString(); break;
+        case 2: m_data[index.row()].state = value.toInt(); break;
+        case 3: m_data[index.row()].response = value.toString(); break;
+        case 4: m_data[index.row()].line = value.toInt(); break;
+        case 5: m_data[index.row()].args = value.toStringList(); break;
         }
         emit dataChanged(index, index);
         return true;
@@ -68,7 +68,7 @@ bool GCodeTableModel::insertRow(int row, const QModelIndex &parent)
     if (row > rowCount()) return false;
 
     beginInsertRows(parent, row, row);
-    m_data.insert(row, new GCodeItem());
+    m_data.insert(row, GCodeItem());
     endInsertRows();
     return true;
 }
@@ -83,11 +83,19 @@ bool GCodeTableModel::removeRow(int row, const QModelIndex &parent)
     return true;
 }
 
+bool GCodeTableModel::removeRows(int row, int count, const QModelIndex &parent)
+{
+    beginRemoveRows(parent, row, row + count - 1);
+    m_data.erase(m_data.begin() + row, m_data.begin() + row + count);
+    endRemoveRows();
+    return true;
+}
+
 void GCodeTableModel::clear()
 {
     beginResetModel();
 
-    foreach (GCodeItem* item, m_data) delete item;
+//    foreach (GCodeItem* item, m_data) delete item;
 
     m_data.clear();
     endResetModel();
@@ -118,5 +126,10 @@ Qt::ItemFlags GCodeTableModel::flags(const QModelIndex &index) const
 {
     if (!index.isValid()) return NULL;
     if (index.column() == 1) return QAbstractTableModel::flags(index) | Qt::ItemIsEditable;
-        else return QAbstractTableModel::flags(index);
+    else return QAbstractTableModel::flags(index);
+}
+
+QList<GCodeItem> &GCodeTableModel::data()
+{
+    return m_data;
 }

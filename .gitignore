@@ -47,3 +47,9 @@ Temporary Items
 
 # Build dir
 build-*
+
+# Binaries
+bin/*
+
+# Idea
+.idea

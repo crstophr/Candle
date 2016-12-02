@@ -1,5 +1,5 @@
-// This file is a part of "grblControl" application.
-// Copyright 2015 Hayrullin Denis Ravilevich
+// This file is a part of "Candle" application.
+// Copyright 2015-2016 Hayrullin Denis Ravilevich
 
 #include "glwidget.h"
 #include "drawers/tooldrawer.h"
@@ -56,8 +56,10 @@ GLWidget::GLWidget(QWidget *parent) : QGLWidget(parent), m_shaderProgram(0)
     m_spendTime.setHMS(0, 0, 0);
     m_estimatedTime.setHMS(0, 0, 0);
 
+    m_vsync = false;
+    m_targetFps = 60;
+
     QTimer::singleShot(1000, this, SLOT(onFramesTimer()));
-    setFps(60);      
 }
 
 GLWidget::~GLWidget()
@@ -123,12 +125,12 @@ void GLWidget::fitDrawable(ShaderDrawable *drawable)
 
 void GLWidget::updateExtremes(ShaderDrawable *drawable)
 {
-    if (!std::isnan(drawable->getMinimumExtremes().x())) m_xMin = drawable->getMinimumExtremes().x(); else m_xMin = 0;
-    if (!std::isnan(drawable->getMaximumExtremes().x())) m_xMax = drawable->getMaximumExtremes().x(); else m_xMax = 0;
-    if (!std::isnan(drawable->getMinimumExtremes().y())) m_yMin = drawable->getMinimumExtremes().y(); else m_yMin = 0;
-    if (!std::isnan(drawable->getMaximumExtremes().y())) m_yMax = drawable->getMaximumExtremes().y(); else m_yMax = 0;
-    if (!std::isnan(drawable->getMinimumExtremes().z())) m_zMin = drawable->getMinimumExtremes().z(); else m_zMin = 0;
-    if (!std::isnan(drawable->getMaximumExtremes().z())) m_zMax = drawable->getMaximumExtremes().z(); else m_zMax = 0;
+    if (!qIsNaN(drawable->getMinimumExtremes().x())) m_xMin = drawable->getMinimumExtremes().x(); else m_xMin = 0;
+    if (!qIsNaN(drawable->getMaximumExtremes().x())) m_xMax = drawable->getMaximumExtremes().x(); else m_xMax = 0;
+    if (!qIsNaN(drawable->getMinimumExtremes().y())) m_yMin = drawable->getMinimumExtremes().y(); else m_yMin = 0;
+    if (!qIsNaN(drawable->getMaximumExtremes().y())) m_yMax = drawable->getMaximumExtremes().y(); else m_yMax = 0;
+    if (!qIsNaN(drawable->getMinimumExtremes().z())) m_zMin = drawable->getMinimumExtremes().z(); else m_zMin = 0;
+    if (!qIsNaN(drawable->getMaximumExtremes().z())) m_zMax = drawable->getMaximumExtremes().z(); else m_zMax = 0;
 
     m_xSize = m_xMax - m_xMin;
     m_ySize = m_yMax - m_yMin;
@@ -155,9 +157,9 @@ void GLWidget::onFramesTimer()
 
 void GLWidget::viewAnimation()
 {
-    double t = (double)m_animationFrame++ / (m_targetFps * 0.2);
+    double t = (double)m_animationFrame++ / (m_fps * 0.2);
 
-    if (t == 1) stopViewAnimation();
+    if (t >= 1) stopViewAnimation();
 
     QEasingCurve ec(QEasingCurve::OutExpo);
     double val = ec.valueForProgress(t);
@@ -166,6 +168,16 @@ void GLWidget::viewAnimation()
     m_yRot = m_yRotStored + double(m_yRotTarget - m_yRotStored) * val;
 
     updateView();
+}
+
+bool GLWidget::vsync() const
+{
+    return m_vsync;
+}
+
+void GLWidget::setVsync(bool vsync)
+{
+    m_vsync = vsync;
 }
 
 bool GLWidget::msaa() const
@@ -297,8 +309,8 @@ void GLWidget::setFps(int fps)
 {
     if (fps <= 0) return;
     m_targetFps = fps;
-    m_timerAnimation.stop();
-    m_timerAnimation.start(1000 / fps, Qt::PreciseTimer, this);
+    m_timerPaint.stop();
+    m_timerPaint.start(m_vsync ? 0 : 1000 / fps, Qt::PreciseTimer, this);
 }
 
 QTime GLWidget::estimatedTime() const
@@ -323,6 +335,11 @@ void GLWidget::setSpendTime(const QTime &spendTime)
 
 void GLWidget::initializeGL()
 {
+#ifndef GLES
+    // Initialize functions
+    initializeOpenGLFunctions();
+#endif
+
     // Create shader program
     m_shaderProgram = new QOpenGLShaderProgram();
 
@@ -384,13 +401,16 @@ void GLWidget::paintEvent(QPaintEvent *pe) {
     QPainter painter(this);
 
     // Segment counter
-    int vertices = 0;  
+    int vertices = 0;
 
     painter.beginNativePainting();
 
     // Clear viewport
     glClearColor(m_colorBackground.redF(), m_colorBackground.greenF(), m_colorBackground.blueF(), 1.0);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+    // Shader drawable points
+    glEnable(GL_PROGRAM_POINT_SIZE);
 
     // Update settings
     if (m_antialiasing) {
@@ -405,7 +425,6 @@ void GLWidget::paintEvent(QPaintEvent *pe) {
         }
     }
     if (m_zBuffer) glEnable(GL_DEPTH_TEST);
-    glShadeModel(GL_SMOOTH);
 
     if (m_shaderProgram) {
         // Draw 3d
@@ -426,10 +445,9 @@ void GLWidget::paintEvent(QPaintEvent *pe) {
         }
 
         m_shaderProgram->release();
-    }    
+    }
 
     // Draw 2D
-    glShadeModel(GL_FLAT);
     glDisable(GL_DEPTH_TEST);
     glDisable(GL_MULTISAMPLE);
     glDisable(GL_LINE_SMOOTH);
@@ -525,7 +543,7 @@ void GLWidget::wheelEvent(QWheelEvent *we)
 
 void GLWidget::timerEvent(QTimerEvent *te)
 {
-    if (te->timerId() == m_timerAnimation.timerId()) {
+    if (te->timerId() == m_timerPaint.timerId()) {
         if (m_animateView) viewAnimation();
 #ifndef GLES
         if (m_updatesEnabled) update();

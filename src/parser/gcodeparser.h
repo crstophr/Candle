@@ -1,15 +1,16 @@
-// This file is a part of "grblControl" application.
+// This file is a part of "Candle" application.
 // This file was originally ported from "GcodeParser.java" class
 // of "Universal GcodeSender" application written by Will Winder
 // (https://github.com/winder/Universal-G-Code-Sender)
 
-// Copyright 2015 Hayrullin Denis Ravilevich
+// Copyright 2015-2016 Hayrullin Denis Ravilevich
 
 #ifndef GCODEPARSER_H
 #define GCODEPARSER_H
 
 #include <QObject>
 #include <QVector3D>
+#include <cmath>
 #include "pointsegment.h"
 #include "gcodepreprocessorutils.h"
 
@@ -32,14 +33,14 @@ public:
     void setSpeedOverride(double speedOverride);
     int getTruncateDecimalLength();
     void setTruncateDecimalLength(int truncateDecimalLength);
-    void reset();
+    void reset(const QVector3D &initialPoint = QVector3D(qQNaN(), qQNaN(), qQNaN()));
     PointSegment *addCommand(QString command);
-    PointSegment *addCommand(QList<QString> args);
+    PointSegment *addCommand(const QStringList &args);
     QVector3D* getCurrentPoint();
     QList<PointSegment *> expandArc();
-    QList<QString> preprocessCommands(QList<QString> commands);
-    QList<QString> preprocessCommand(QString command);
-    QList<QString> convertArcsToLines(QString command);
+    QStringList preprocessCommands(QStringList commands);
+    QStringList preprocessCommand(QString command);
+    QStringList convertArcsToLines(QString command);
     QList<PointSegment *> getPointSegmentList();
     double getTraverseSpeed() const;
     void setTraverseSpeed(double traverseSpeed);
@@ -55,7 +56,7 @@ private:
     bool m_isMetric;
     bool m_inAbsoluteMode;
     bool m_inAbsoluteIJKMode;
-    QString m_lastGcodeCommand;
+    float m_lastGcodeCommand;
     QVector3D m_currentPoint;
     int m_commandNumber;
     PointSegment::planes m_currentPlane;
@@ -71,15 +72,17 @@ private:
 
     double m_lastSpeed;
     double m_traverseSpeed;
+    double m_lastSpindleSpeed;
 
     // The gcode.
     QList<PointSegment*> m_points;
 
-    PointSegment *processCommand(QList<QString> args);
-    PointSegment *handleGCode(QString code, QList<QString> &args);
-    PointSegment *addLinearPointSegment(QVector3D nextPoint, bool fastTraverse);
-    PointSegment *addArcPointSegment(QVector3D nextPoint, bool clockwise, QList<QString> args);
-    void setLastGcodeCommand(QString num);
+    PointSegment *processCommand(const QStringList &args);
+    void handleMCode(float code, const QStringList &args);
+    PointSegment *handleGCode(float code, const QStringList &args);
+    PointSegment *addLinearPointSegment(const QVector3D &nextPoint, bool fastTraverse);
+    PointSegment *addArcPointSegment(const QVector3D &nextPoint, bool clockwise, const QStringList &args);
+    void setLastGcodeCommand(float num);
 };
 
 #endif // GCODEPARSER_H

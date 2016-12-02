@@ -1,5 +1,5 @@
-// This file is a part of "grblControl" application.
-// Copyright 2015 Hayrullin Denis Ravilevich
+// This file is a part of "Candle" application.
+// Copyright 2015-2016 Hayrullin Denis Ravilevich
 
 #ifndef GCODEDRAWER_H
 #define GCODEDRAWER_H
@@ -10,9 +10,13 @@
 #include "parser/gcodeviewparse.h"
 #include "shaderdrawable.h"
 
-class GcodeDrawer : public ShaderDrawable
+class GcodeDrawer : public QObject, public ShaderDrawable
 {
+    Q_OBJECT
 public:
+    enum GrayscaleCode { S, Z };
+    enum DrawMode { Vectors, Raster };
+
     explicit GcodeDrawer();
 
     void update();
@@ -52,15 +56,43 @@ public:
     QColor colorEnd() const;
     void setColorEnd(const QColor &colorEnd);
 
+    bool getIgnoreZ() const;
+    void setIgnoreZ(bool ignoreZ);
+
+    bool getGrayscaleSegments() const;
+    void setGrayscaleSegments(bool grayscaleSegments);
+
+    GrayscaleCode grayscaleCode() const;
+    void setGrayscaleCode(const GrayscaleCode &grayscaleCode);
+
+    int grayscaleMin() const;
+    void setGrayscaleMin(int grayscaleMin);
+
+    int grayscaleMax() const;
+    void setGrayscaleMax(int grayscaleMax);
+
+    DrawMode drawMode() const;
+    void setDrawMode(const DrawMode &drawMode);
+
 signals:
 
 public slots:
 
+private slots:
+    void onTimerVertexUpdate();
+
 private:
     GcodeViewParse *m_viewParser;
+
+    DrawMode m_drawMode;
+
     bool m_simplify;
     double m_simplifyPrecision;
-    bool m_geometryUpdated;
+    bool m_ignoreZ;
+    bool m_grayscaleSegments;
+    GrayscaleCode m_grayscaleCode;
+    int m_grayscaleMin;
+    int m_grayscaleMax;   
 
     QColor m_colorNormal;
     QColor m_colorDrawn;
@@ -69,10 +101,21 @@ private:
     QColor m_colorStart;
     QColor m_colorEnd;
 
+    QTimer m_timerVertexUpdate;
+
+    QImage m_image;
     QList<int> m_indexes;
+    bool m_geometryUpdated;
+
+    bool prepareVectors();
+    bool updateVectors();
+    bool prepareRaster();
+    bool updateRaster();
 
     int getSegmentType(LineSegment *segment);
-    QVector3D getSegmentColor(LineSegment *segment);
+    QVector3D getSegmentColorVector(LineSegment *segment);
+    QColor getSegmentColor(LineSegment *segment);
+    void setImagePixelColor(QImage &image, int x, int y, QRgb color) const;
 };
 
 #endif // GCODEDRAWER_H
